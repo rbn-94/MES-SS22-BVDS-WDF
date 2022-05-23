@@ -15,6 +15,20 @@ figure(2)
 freqz(yhp(1:10000),1,10000)
 title('WDF 19. Grades Hochpass')
 
+[htp,wtp] = freqz(ytp(1:10000),1,10000);
+[hhp,whp] = freqz(yhp(1:10000),1,10000);
+figure(3)
+plot(wtp/pi,20*log10(abs(htp)))
+hold on;
+plot(whp/pi,20*log10(abs(hhp)))
+grid minor;
+ax = gca;
+ax.YLim = [-100 20];
+ax.XTick = 0:.5:2;
+xlabel('Normalized Frequency (\times\pi rad/sample)')
+ylabel('Magnitude (dB)')
+legend('Tiefpass','Hochpass')
+
 
 
 %% wdf 19. Degree
