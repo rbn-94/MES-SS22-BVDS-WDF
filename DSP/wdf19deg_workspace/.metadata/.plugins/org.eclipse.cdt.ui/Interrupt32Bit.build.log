@@ -1,0 +1,26 @@
+
+**** Build of configuration Debug for project Interrupt32Bit ****
+
+"C:\\ti\\ccsv5\\utils\\bin\\gmake" -k all 
+'Building file: ../wdf19deg.c'
+'Invoking: C6000 Compiler'
+"C:/ti/ccsv5/tools/compiler/c6000_7.4.4/bin/cl6x" -mv6710 --abi=coffabi -O0 -g --include_path="C:/ti/ccsv5/tools/compiler/c6000_7.4.4/include" --include_path="C:/ti/ccsv5/C6xCSL/include" --include_path=".." --include_path="C:/ti/ccsv5/DSK6713/c6000/dsk6713/include" --define="_DEBUG" --define="CHIP_6713" --display_error_number --diag_warning=225 --diag_wrap=off --mem_model:data=far --preproc_with_compile --preproc_dependency="wdf19deg.pp"  "../wdf19deg.c"
+'Finished building: ../wdf19deg.c'
+' '
+'Building target: Interrupt32Bit.out'
+'Invoking: C6000 Linker'
+"C:/ti/ccsv5/tools/compiler/c6000_7.4.4/bin/cl6x" -mv6710 --abi=coffabi -O0 -g --define="_DEBUG" --define="CHIP_6713" --display_error_number --diag_warning=225 --diag_wrap=off --mem_model:data=far -z -m"Interrupt32Bit.map" -i"C:/ti/ccsv5/tools/compiler/c6000_7.4.4/lib" -i"C:/ti/ccsv5/DSK6713/c6000/dsk6713/lib" -i"F:/Studium/Master/SS_22/Git_Repos/MES-SS22-BVDS-WDF/DSP/wdf19deg_workspace/Interrupt32Bit" -i"C:/ti/ccsv5/C6xCSL/lib_3x" -i"C:/ti/ccsv5/tools/compiler/c6000_7.4.4/include" --reread_libs --warn_sections --display_error_number --diag_wrap=off --xml_link_info="Interrupt32Bit_linkInfo.xml" --rom_model -o "Interrupt32Bit.out"  "./wdf19deg.obj" "./subroutines.obj" "./interrupt32_2.obj" "./fixed.obj" "./fft.obj" "./DSK_vectors_AIC23.obj" "../dsk6713.cmd" -l"libc.a" 
+<Linking>
+warning #16002-D: build attribute vendor section TI missing in "C:/ti/ccsv5/C6xCSL/lib_3x/csl6713.lib<csl_edma.obj>": compatibility cannot be determined
+warning #16002-D: build attribute vendor section TI missing in "C:/ti/ccsv5/C6xCSL/lib_3x/csl6713.lib<csl_irq.obj>": compatibility cannot be determined
+warning #16002-D: build attribute vendor section TI missing in "C:/ti/ccsv5/C6xCSL/lib_3x/csl6713.lib<csl_mcbsp.obj>": compatibility cannot be determined
+warning #16002-D: build attribute vendor section TI missing in "C:/ti/ccsv5/C6xCSL/lib_3x/csl6713.lib<csl_timer.obj>": compatibility cannot be determined
+warning #16002-D: build attribute vendor section TI missing in "C:/ti/ccsv5/DSK6713/c6000/dsk6713/lib/dsk6713bsl.lib<dsk6713.obj>": compatibility cannot be determined
+warning #16002-D: build attribute vendor section TI missing in "C:/ti/ccsv5/DSK6713/c6000/dsk6713/lib/dsk6713bsl.lib<dsk6713_aic23_opencodec.obj>": compatibility cannot be determined
+warning #16002-D: build attribute vendor section TI missing in "C:/ti/ccsv5/DSK6713/c6000/dsk6713/lib/dsk6713bsl.lib<dsk6713_aic23_registers.obj>": compatibility cannot be determined
+warning #16002-D: build attribute vendor section TI missing in "C:/ti/ccsv5/DSK6713/c6000/dsk6713/lib/dsk6713bsl.lib<dsk6713_aic23_setfreq.obj>": compatibility cannot be determined
+warning #16002-D: build attribute vendor section TI missing in "C:/ti/ccsv5/DSK6713/c6000/dsk6713/lib/dsk6713bsl.lib<dsk6713_led.obj>": compatibility cannot be determined
+'Finished building target: Interrupt32Bit.out'
+' '
+
+**** Build Finished ****

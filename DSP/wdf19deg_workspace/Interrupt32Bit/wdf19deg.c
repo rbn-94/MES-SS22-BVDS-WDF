@@ -6,57 +6,75 @@
  * @desc DSP code for wave digital filter of 19. degree
  */
 
-// TODO: What types?
+#include "wdf19deg.h"
 
 /* Globals for delays T and 2T */
-int upper2T[4][2]       = {{0, 0}, {0, 0}, {0, 0}, {0, 0}};
-int upperT              = 0;
+double upper2T[4][2]       = {{0, 0}, {0, 0}, {0, 0}, {0, 0}};
+double upperT              = 0;
 
-int lower2T[5][2]       = {{0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}};
+double lower2T[5][2]       = {{0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}};
 
 /* Coefficients */
 double alphas[9] = {
-    0.226119,
+    -0.226119,
     0.397578,
     0.160677,
     0.049153,
-    0.063978,
-    0.423068,
+    -0.063978,
+    -0.423068,
     0.258673,
     0.094433,
     0.015279
 };
 
 /* Prototypes */
-void twoPortCrossAdaptor(double alpha, int inA1, int inA2, int* outB1, int* outB2);
-void twoPortAdaptor(double alpha, int inA1, int inA2, int* outB1, int* outB2);
+void twoPortCrossAdaptor(double alpha, double inA1, double inA2, double* outB1, double* outB2);
+void twoPortAdaptor(double alpha, double inA1, double inA2, double* outB1, double* outB2);
 
 /*
  * Implements a 19. degree WDF  
  */
-int wdf19deg(int x)
+#if 0
+double wdf19deg(double x)
 {
-    int x = 0; // Dummy for samples
+	// Variables for Adaptor out and inputs
+	double b1, b2, a1;
 
+	a1 = x;
+
+	twoPortCrossAdaptor(alphas[0], a1, upper2T[0][1], &b1, &b2);
+
+	// Shift delay values
+	upper2T[0][1] = upper2T[0][0];
+	upper2T[0][0] = b2;
+
+	return b1;
+}
+#endif
+
+#if 1
+double wdf19deg(double x)
+{
     // Variables for Adaptor out and inputs
-    int b1, b2, a1;
+	double b1, b2, a1;
 
-    // Interim results
-    int yUpper = 0, yLower = 0;
+    // interim results
+	double yUpper = 0, yLower = 0;
 
     /****** Upper half ******/
     a1 = x;
 
     // calculate adaptors
-    for (int i = 0; i < 4; i++)
+    int i = 0;
+    for (i = 0; i < 4; i++)
     {
         if (i < 1)
         {
-            twoPortCrossAdaptor(alphas[i], a1, upper2T[i][1], b1, b2);
+            twoPortCrossAdaptor(alphas[i], a1, upper2T[i][1], &b1, &b2);
         }
         else
         {
-            twoPortAdaptor(alphas[i], a1, upper2T[i][1], b1, b2);
+            twoPortAdaptor(alphas[i], a1, upper2T[i][1], &b1, &b2);
         }
         // Shift delay values
         upper2T[i][1] = upper2T[i][0];
@@ -72,15 +90,15 @@ int wdf19deg(int x)
     a1 = x;
 
     // calculate adaptors
-    for (int i = 0; i < 5; i++)
+    for (i = 0; i < 5; i++)
     {
         if (i < 2)
         {
-            twoPortCrossAdaptor(alphas[4+i], a1, lower2T[i][1], b1, b2);
+            twoPortCrossAdaptor(alphas[4+i], a1, lower2T[i][1], &b1, &b2);
         }
         else
         {
-            twoPortAdaptor(alphas[4+i], a1, lower2T[i][1], b1, b2);
+            twoPortAdaptor(alphas[4+i], a1, lower2T[i][1], &b1, &b2);
         }        
         // Shift delay values
         lower2T[i][1] = lower2T[i][0];
@@ -91,17 +109,18 @@ int wdf19deg(int x)
     // Output of lower branch
     yLower = b1;
 
-    return (1/2 * (yUpper + yLower));
+    return (0.5 * (yUpper + yLower));
 }
+#endif
 
 /*
  * Calculate a two-port adaptor with crossed output side 
  */
 // TODO: Type of alpha?
-void twoPortCrossAdaptor(double alpha, int inA1, int inA2, int* outB1, int* outB2)
+void twoPortCrossAdaptor(double alpha, double inA1, double inA2, double* outB1, double* outB2)
 {
     // TODO: Not sure of sign of inA1 and alpha here (they differ in Gaszi document in different figures)
-    int firstAdder = -inA1 + inA2; 
+    double firstAdder = -inA1 + inA2;
     
     // Calculate outputs
     *outB1 = (alpha * firstAdder) + (-1) * inA2;
@@ -112,10 +131,10 @@ void twoPortCrossAdaptor(double alpha, int inA1, int inA2, int* outB1, int* outB
  * Calculate a two-port adaptor
  */
 // TODO: Type of alpha?
-void twoPortAdaptor(double alpha, int inA1, int inA2, int* outB1, int* outB2)
+void twoPortAdaptor(double alpha, double inA1, double inA2, double* outB1, double* outB2)
 {
     // TODO: Not sure of sign of inA1 and alpha here (they differ in Gaszi document in different figures)
-    int firstAdder = -inA1 + inA2; 
+    double firstAdder = -inA1 + inA2;
     
     // Calculate outputs
     *outB2 = (alpha * firstAdder) + (-1) * inA2;
