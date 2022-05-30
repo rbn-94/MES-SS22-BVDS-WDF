@@ -7,7 +7,6 @@ signal = [1; zeros(64000,1)]'; % Impuls
 
 
 %weights
-
 alpha0=1;
 alpha1=1;
 alpha2=1;
@@ -19,7 +18,7 @@ alpha7=1;
 alpha8=1;
 
 
-%filter cascade
+%filter cascaded low-pass-outputs
 [ytp, yhp]=wdf19deg(signal,1);     % 1. Filter
 [ytp1, yhp1]=wdf19deg(ytp,2);      % 2. Filter
 [ytp2, yhp2]=wdf19deg(ytp1,4);     % 3. Filter
@@ -29,6 +28,7 @@ alpha8=1;
 [ytp6, yhp6]=wdf19deg(ytp5,64);    % 7. Filter
 [ytp7, yhp7]=wdf19deg(ytp6,128);   % 8. Filter
 
+% initiate delays after high-pass output of cascaded filters
 d0=zeros(1000,1);
 d1=zeros(1000,1);
 d2=zeros(1000,1);
@@ -50,6 +50,7 @@ yo7=zeros(length(yhp),1);
 
 d = 10; % delay of lower line in filter
 
+%set the delays after high-pass output of cascaded filters
 for i=1:length(yhp)
 d0(1) = yhp(i);
 d0 = circshift(d0, 1);
@@ -80,12 +81,14 @@ d6 = circshift(d6, 1);
 yo6(i)=d6(1*(d+1));
 
 yo7 =yhp7; % no delay
-
 end
 
-% b_out=(yo0.*alpha0)+(yo1.*alpha1)+(yo2.*alpha2)+(yo3.*alpha3)+(yo4.*alpha4)+(yo5.*alpha5)+(yo6.*alpha6)+(ytp7*alpha7)+(yo7*alpha8);
-b_out=(ytp.*alpha0)+(ytp1.*alpha1)+(ytp2.*alpha2)+(ytp3.*alpha3)+(ytp4.*alpha4)+(ytp5.*alpha5)+(ytp6.*alpha6)+(ytp7*alpha7)+(yo7*alpha8);
 
+%sum of all filter outputs --> output of octave filter
+% b_out=(yo0.*alpha0)+(yo1.*alpha1)+(yo2.*alpha2)+(yo3.*alpha3)+(yo4.*alpha4)+(yo5.*alpha5)+(yo6.*alpha6)+(ytp7*alpha7)+(yo7*alpha8);
+% b_out=(ytp.*alpha0)+(ytp1.*alpha1)+(ytp2.*alpha2)+(ytp3.*alpha3)+(ytp4.*alpha4)+(ytp5.*alpha5)+(ytp6.*alpha6)+(ytp7.*alpha7)+(yo7.*alpha8);
+
+b_out=(((((((ytp.*alpha0)+(ytp1.*alpha1))+(ytp2.*alpha2))+(ytp3.*alpha3))+(ytp4.*alpha4))+(ytp5.*alpha5))+(ytp6.*alpha6))+(ytp7.*alpha7)+(yo7.*alpha8);
 
 % figure(1)
 % freqz(ytp(1:10000),1,10000)
@@ -109,59 +112,61 @@ b_out=(ytp.*alpha0)+(ytp1.*alpha1)+(ytp2.*alpha2)+(ytp3.*alpha3)+(ytp4.*alpha4)+
 % ylabel('Magnitude (dB)')
 % legend('Tiefpass','Hochpass')
 
-% figure(4)
-% freqz(ytp(1:10000),1,10000)
-% hold on
-% freqz(ytp1(1:10000),1,10000)
-% freqz(ytp2(1:10000),1,10000)
-% title('WDF 19. Grades Tiefpass')
+figure(4)
+freqz(ytp(1:10000),1,10000)
+hold on
+freqz(ytp1(1:10000),1,10000)
+freqz(ytp2(1:10000),1,10000)
+title('WDF 19. Grades Tiefpass')
 
 
+%plot of final output
+figure(5)
 freqz(b_out(1:64000),1,64000)
 title('Output filterbank')
 
+%plot of every cascaded filter
+figure(6)
+[htp,wtp] = freqz(ytp(1:64000),1,64000);
+hold on;
+[hhp,whp] = freqz(yhp(1:64000),1,64000);
+[htp1,wtp1] = freqz(ytp1(1:64000),1,64000);
+[hhp1,whp1] = freqz(yhp1(1:64000),1,64000);
+[htp2,wtp2] = freqz(ytp2(1:64000),1,64000);
+[hhp2,whp2] = freqz(yhp2(1:64000),1,64000);
+[htp3,wtp3] = freqz(ytp3(1:64000),1,64000);
+[hhp3,whp3] = freqz(yhp3(1:64000),1,64000);
+[htp4,wtp4] = freqz(ytp4(1:64000),1,64000);
+[hhp4,whp4] = freqz(yhp4(1:64000),1,64000);
+[htp5,wtp5] = freqz(ytp5(1:64000),1,64000);
+[hhp5,whp5] = freqz(yhp5(1:64000),1,64000);
+[htp6,wtp6] = freqz(ytp6(1:64000),1,64000);
+[hhp6,whp6] = freqz(yhp6(1:64000),1,64000);
+[htp7,wtp7] = freqz(ytp7(1:64000),1,64000);
+[hhp7,whp7] = freqz(yhp7(1:64000),1,64000);
 
-[htp,wtp] = freqz(ytp(1:10000),1,10000);
-[hhp,whp] = freqz(yhp(1:10000),1,10000);
-[htp1,wtp1] = freqz(ytp1(1:10000),1,10000);
-[hhp1,whp1] = freqz(yhp1(1:10000),1,10000);
-[htp2,wtp2] = freqz(ytp2(1:10000),1,10000);
-[hhp2,whp2] = freqz(yhp2(1:10000),1,10000);
-[htp3,wtp3] = freqz(ytp3(1:10000),1,10000);
-[hhp3,whp3] = freqz(yhp3(1:10000),1,10000);
-[htp4,wtp4] = freqz(ytp4(1:10000),1,10000);
-[hhp4,whp4] = freqz(yhp4(1:10000),1,10000);
-[htp5,wtp5] = freqz(ytp5(1:10000),1,10000);
-[hhp5,whp5] = freqz(yhp5(1:10000),1,10000);
-[htp6,wtp6] = freqz(ytp6(1:10000),1,10000);
-[hhp6,whp6] = freqz(yhp6(1:10000),1,10000);
-[htp7,wtp7] = freqz(ytp7(1:10000),1,10000);
-[hhp7,whp7] = freqz(yhp7(1:10000),1,10000);
-
-
-
-figure(3) ;
+figure(7) ;
 plot(wtp/pi,20*log10(abs(htp)))
 hold on;
 plot(whp/pi,20*log10(abs(htp1)))
 plot(whp/pi,20*log10(abs(htp2)))
 plot(whp/pi,20*log10(abs(htp3)))
 plot(whp/pi,20*log10(abs(htp4)))
-% plot(whp/pi,20*log10(abs(htp5)))
-% plot(whp/pi,20*log10(abs(htp6)))
-% plot(whp/pi,20*log10(abs(htp7)))
+plot(whp/pi,20*log10(abs(htp5)))
+plot(whp/pi,20*log10(abs(htp6)))
+plot(whp/pi,20*log10(abs(htp7)))
 grid minor;
 ax = gca;
 ax.YLim = [-100 20];
 ax.XTick = 0:.5:2;
 xlabel('Normalized Frequency (\times\pi rad/sample)')
 ylabel('Magnitude (dB)')
-legend('1. Filter','2. Filter','3. Filter','4. Filter','5. Filter')
+legend('1. Filter','2. Filter','3. Filter','4. Filter','5. Filter','6. Filter','7. Filter','8. Filter')
 
 
 
 %% wdf 19. Degree
-function [y1, y2] = wdf19deg(signal,n)
+function [y1, y2] = wdf19deg(signal,n) %ouput: y1:low-Fass y2:high-pass Input:signal, number of delays
 xo= circshift(signal,n);
 
 for i=1:n
@@ -171,7 +176,7 @@ xu = signal;
 
 n=n*2;
 
-% Koeffizienten
+% coefficients
 
 a1=-0.226119;
 a2=0.397578;
@@ -204,7 +209,7 @@ end
 
 
 %% Cross Adaptor
-function [y] = cross(xo, a, n)
+function [y] = cross(xo, a, n) %Output y of cross adaptor Input: inputvector, coefficient, number of delays
 
 xt = zeros(1000, 1);
 y = zeros(length(xo), 1);
@@ -220,7 +225,7 @@ end
 end
 
 %% Adaptor
-function [y] = adaptor(xo, a, n)
+function [y] = adaptor(xo, a, n) %Output y of cross adaptor Input: inputvector, coefficient, number of delays
 
 xt = zeros(1000, 1);
 y = zeros(length(xo), 1);
