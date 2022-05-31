@@ -2,10 +2,13 @@ clear all
 close all
 clc
 
-
+%%
 signal = [1; zeros(64000,1)]'; % Impuls
 
+%%
+% signal=audioread("piano2.wav");
 
+%%
 %weights
 alpha0=1;
 alpha1=1;
@@ -28,105 +31,74 @@ alpha8=1;
 [ytp6, yhp6]=wdf19deg(ytp5,64);    % 7. Filter
 [ytp7, yhp7]=wdf19deg(ytp6,128);   % 8. Filter
 
-% initiate delays after high-pass output of cascaded filters
-d0=zeros(1000,1);
-d1=zeros(1000,1);
-d2=zeros(1000,1);
-d3=zeros(1000,1);
-d4=zeros(1000,1);
-d5=zeros(1000,1);
-d6=zeros(1000,1);
-d7=zeros(1000,1);
-yo0=zeros(length(yhp),1);
-yo1=zeros(length(yhp),1);
-yo2=zeros(length(yhp),1);
-yo3=zeros(length(yhp),1);
-yo4=zeros(length(yhp),1);
-yo5=zeros(length(yhp),1);
-yo6=zeros(length(yhp),1);
-yo7=zeros(length(yhp),1);
 
+% calc delays
+d0 = 4; % initial delay length
 
+d7 = 2^7 * d0;
+d6 = d7 + 2^6*d0;
+d5 = d6 + 2^5*d0;
+d4 = d5 + 2^4*d0;
+d3 = d4 + 2^3*d0;
+d2 = d3 + 2^2*d0;
+d1 = d2 + 2^1*d0;
 
-d = 10; % delay of lower line in filter
+delayS1=delay(yhp, d1);
+delayS2=delay(yhp1, d2);
+delayS3=delay(yhp2, d3);
+delayS4=delay(yhp3, d4);
+delayS5=delay(yhp4, d5);
+delayS6=delay(yhp5, d6);
+delayS7=delay(yhp6, d7);
 
-%set the delays after high-pass output of cascaded filters
-for i=1:length(yhp)
-d0(1) = yhp(i);
-d0 = circshift(d0, 1);
-yo0(i) = d0(7*(d+1));
-
-d1(1) = yhp1(i);
-d1 = circshift(d1, 1);
-yo1(i)= d1(6*(d+1));
-
-d2(1) = yhp2(i);
-d2 = circshift(d2, 1);
-yo2(i)=d0(5*(d+1));
-
-d3(1) = yhp3(i);
-d3 = circshift(d3, 1);
-yo3(i)=d3(4*(d+1));
-
-d4(1) = yhp4(i);
-d4 = circshift(d4, 1);
-yo4(i)=d4(3*(d+1));
-
-d5(1) = yhp5(i);
-d5 = circshift(d5, 1);
-yo5(i)=d5(2*(d+1));
-
-d6(1) = yhp6(i);
-d6 = circshift(d6, 1);
-yo6(i)=d6(1*(d+1));
-
-yo7 =yhp7; % no delay
-end
 
 
 %sum of all filter outputs --> output of octave filter
-% b_out=(yo0.*alpha0)+(yo1.*alpha1)+(yo2.*alpha2)+(yo3.*alpha3)+(yo4.*alpha4)+(yo5.*alpha5)+(yo6.*alpha6)+(ytp7*alpha7)+(yo7*alpha8);
-% b_out=(ytp.*alpha0)+(ytp1.*alpha1)+(ytp2.*alpha2)+(ytp3.*alpha3)+(ytp4.*alpha4)+(ytp5.*alpha5)+(ytp6.*alpha6)+(ytp7.*alpha7)+(yo7.*alpha8);
+b_out=(yhp.*alpha0)+(yhp1.*alpha1)+(yhp2.*alpha2)+(yhp3.*alpha3)+(yhp4.*alpha4)+(yhp5.*alpha5)+(yhp6.*alpha6)+(yhp7.*alpha7)+(ytp7.*alpha8);
 
-b_out=(((((((ytp.*alpha0)+(ytp1.*alpha1))+(ytp2.*alpha2))+(ytp3.*alpha3))+(ytp4.*alpha4))+(ytp5.*alpha5))+(ytp6.*alpha6))+(ytp7.*alpha7)+(yo7.*alpha8);
+%sum of all filter outputs with delays --> output of octave filter
+b_out_with_delays=(delayS1.*alpha0)+(delayS2.*alpha1)+(delayS3.*alpha2)+(delayS4.*alpha3)+(delayS5.*alpha4)+(delayS6.*alpha5)+(delayS7.*alpha6)+(yhp7.*alpha7)+(ytp7.*alpha8);
 
-% figure(1)
-% freqz(ytp(1:10000),1,10000)
-% title('WDF 19. Grades Tiefpass')
-% 
-% figure(2)
-% freqz(yhp(1:10000),1,10000)
-% title('WDF 19. Grades Hochpass')
-% 
-% [htp,wtp] = freqz(ytp(1:10000),1,10000);
-% [hhp,whp] = freqz(yhp(1:10000),1,10000);
-% figure(3)
-% plot(wtp/pi,20*log10(abs(htp)))
-% hold on;
-% plot(whp/pi,20*log10(abs(hhp)))
-% grid minor;
-% ax = gca;
-% ax.YLim = [-100 20];
-% ax.XTick = 0:.5:2;
-% xlabel('Normalized Frequency (\times\pi rad/sample)')
-% ylabel('Magnitude (dB)')
-% legend('Tiefpass','Hochpass')
 
-figure(4)
+%%
+figure(1)
 freqz(ytp(1:10000),1,10000)
-hold on
-freqz(ytp1(1:10000),1,10000)
-freqz(ytp2(1:10000),1,10000)
 title('WDF 19. Grades Tiefpass')
+%%
+figure(2)
+freqz(yhp(1:10000),1,10000)
+title('WDF 19. Grades Hochpass')
 
+%%
+[htp,wtp] = freqz(ytp(1:64000),1,64000);
+[hhp,whp] = freqz(yhp(1:64000),1,64000);
+figure(3)
+plot(wtp/pi,20*log10(abs(htp)))
+hold on;
+plot(whp/pi,20*log10(abs(hhp)))
+grid minor;
+ax = gca;
+ax.YLim = [-100 20];
+ax.XTick = 0:.5:2;
+xlabel('Normalized Frequency (\times\pi rad/sample)')
+ylabel('Magnitude (dB)')
+legend('Tiefpass','Hochpass')
 
-%plot of final output
-figure(5)
-freqz(b_out(1:64000),1,64000)
-title('Output filterbank')
-
+%%
+figure(4)
+freqz(ytp(1:64000),1,64000)
+hold on
+freqz(ytp1(1:64000),1,64000)
+freqz(ytp2(1:64000),1,64000)
+freqz(ytp3(1:64000),1,64000)
+freqz(ytp4(1:64000),1,64000)
+freqz(ytp5(1:64000),1,64000)
+freqz(ytp6(1:64000),1,10000)
+freqz(ytp7(1:64000),1,64000)
+title('WDF 19. Grades Tiefpass')
+%%
 %plot of every cascaded filter
-figure(6)
+
 [htp,wtp] = freqz(ytp(1:64000),1,64000);
 hold on;
 [hhp,whp] = freqz(yhp(1:64000),1,64000);
@@ -144,8 +116,7 @@ hold on;
 [hhp6,whp6] = freqz(yhp6(1:64000),1,64000);
 [htp7,wtp7] = freqz(ytp7(1:64000),1,64000);
 [hhp7,whp7] = freqz(yhp7(1:64000),1,64000);
-
-figure(7) ;
+figure(5) ;
 plot(wtp/pi,20*log10(abs(htp)))
 hold on;
 plot(whp/pi,20*log10(abs(htp1)))
@@ -163,6 +134,18 @@ xlabel('Normalized Frequency (\times\pi rad/sample)')
 ylabel('Magnitude (dB)')
 legend('1. Filter','2. Filter','3. Filter','4. Filter','5. Filter','6. Filter','7. Filter','8. Filter')
 
+%plot of final output without delays
+figure(6)
+freqz(b_out(1:64000),1,64000)
+title('Output filterbank')
+
+%plot of final output with delays
+figure(7)
+freqz(b_out_with_delays(1:64000),1,64000)
+title('Output filterbank')
+
+%%
+audiowrite("out_piano2.wav",b_out,48000 );
 
 
 %% wdf 19. Degree
@@ -238,4 +221,16 @@ xt(1) = ((-1)*xo(i)+xt(1+n))*a+(xt(1+n)*-1);
 y(i)=((xo(i)*(-1)+xt(1+n))*(-1))+((xo(i)*(-1)+xt(1+n))*a)+((-1)*xt(1+n));
 end
 
+end
+
+%% Delay
+function [y]= delay(x,n)
+
+xt = zeros(round(n)+1, 1);
+y = zeros(length(x), 1);
+for i = 1 : length(x)
+xt = circshift(xt, 1);
+xt(1)=x(i);
+y(i)=xt(round(n)+1);
+end
 end
