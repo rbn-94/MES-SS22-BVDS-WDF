@@ -8,8 +8,6 @@
 
 #include "wdf19deg.h"
 
-#define NUM_DELAY_BLOCKS 9
-
 /* Coefficients */
 double alphas[9] = {
     -0.226119,
@@ -23,13 +21,6 @@ double alphas[9] = {
     0.015279
 };
 
-double weights[4] = {
-		1.0,
-		1.0,
-		1.0,
-		1.0
-};
-
 /* Globals for delays T and 2T */
 double delay2T_1[NUM_DELAY_BLOCKS-1][2];
 double delayT_1[1];
@@ -40,15 +31,9 @@ double delayT_2[2];
 double delay2T_3[NUM_DELAY_BLOCKS-1][8];
 double delayT_3[4];
 
-/* Globals for HP output delays T */
-// Don't know why these delay values... ask Hendrik/Patrick
-double delayHP1[16+8];
-double delayHP2[16];
-
 /* Prototypes */
 void twoPortCrossAdaptor(double alpha, double inA1, double inA2, double* outB1, double* outB2);
 void twoPortAdaptor(double alpha, double inA1, double inA2, double* outB1, double* outB2);
-double wdf19deg(double x, double** delays2T, double* delayT, int n, double* yhp);
 
 void initArray(double* array, int size);
 void init2dArray(double** array, int rows, int cols);
@@ -66,40 +51,13 @@ void initDelays()
 
 double octaveFilterbank(double x)
 {
-	double yhp1, yhp2, yhp3;
-	double ytp1, ytp2, ytp3;
-	double b = 0.0;
-	int i;
 
-	ytp1 = wdf19deg(x, delay2T_1, delayT_1, 1, &yhp1);
-	ytp2 = wdf19deg(ytp1, delay2T_2, delayT_2, 2, &yhp2);
-	ytp3 = wdf19deg(ytp2, delay2T_3, delayT_3, 3, &yhp3);
-
-	// Calculate output
-	b = weights[0]*delayHP1[23] + weights[1]*delayHP2[15] + weights[2]*yhp3 + weights[3]*ytp3;
-
-	// Shift delays
-	for (i = 23; i > 0; i--)
-	{
-		*(delayHP1+i) = *(delayHP1+i-1); // delayHP1[i] = delayHP1[i-1]
-	}
-
-	for (i = 15; i > 0; i--)
-	{
-		*(delayHP2+i) = *(delayHP2+i-1); // delayHP1[i] = delayHP1[i-1]
-	}
-
-	// Save HP outputs into delays
-	delayHP1[0] = yhp1;
-	delayHP2[0] = yhp2;
-
-	return b;
 }
 
 /*
  * Implements a 19. degree WDF  
  */
-double wdf19deg(double x, double** delays2T, double* delayT, int n, double* yhp)
+double wdf19deg(double x, double** delays2T, double* delayT, int n)
 {
     // Variables for Adaptor out and inputs
 	double b1, b2, a1;
@@ -169,8 +127,6 @@ double wdf19deg(double x, double** delays2T, double* delayT, int n, double* yhp)
 
     // Output of lower branch
     yLower = b1;
-
-    *yhp = (0.5 * (-yUpper + yLower));
 
     return (0.5 * (yUpper + yLower));
 }

@@ -8,7 +8,11 @@
 
 #include "wdf19deg.h"
 
-#define NUM_DELAY_BLOCKS 9
+/* Globals for delays T and 2T */
+double upper2T[4][2]       = {{0, 0}, {0, 0}, {0, 0}, {0, 0}};
+double upperT              = 0;
+
+double lower2T[5][2]       = {{0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}};
 
 /* Coefficients */
 double alphas[9] = {
@@ -23,83 +27,33 @@ double alphas[9] = {
     0.015279
 };
 
-double weights[4] = {
-		1.0,
-		1.0,
-		1.0,
-		1.0
-};
-
-/* Globals for delays T and 2T */
-double delay2T_1[NUM_DELAY_BLOCKS-1][2];
-double delayT_1[1];
-
-double delay2T_2[NUM_DELAY_BLOCKS-1][4];
-double delayT_2[2];
-
-double delay2T_3[NUM_DELAY_BLOCKS-1][8];
-double delayT_3[4];
-
-/* Globals for HP output delays T */
-// Don't know why these delay values... ask Hendrik/Patrick
-double delayHP1[16+8];
-double delayHP2[16];
-
 /* Prototypes */
 void twoPortCrossAdaptor(double alpha, double inA1, double inA2, double* outB1, double* outB2);
 void twoPortAdaptor(double alpha, double inA1, double inA2, double* outB1, double* outB2);
-double wdf19deg(double x, double** delays2T, double* delayT, int n, double* yhp);
-
-void initArray(double* array, int size);
-void init2dArray(double** array, int rows, int cols);
-
-void initDelays()
-{
-	init2dArray(delay2T_1, NUM_DELAY_BLOCKS-1, 2);
-	init2dArray(delay2T_2, NUM_DELAY_BLOCKS-1, 4);
-	init2dArray(delay2T_3, NUM_DELAY_BLOCKS-1, 8);
-
-	initArray(delayT_1, 1);
-	initArray(delayT_2, 2);
-	initArray(delayT_3, 4);
-}
-
-double octaveFilterbank(double x)
-{
-	double yhp1, yhp2, yhp3;
-	double ytp1, ytp2, ytp3;
-	double b = 0.0;
-	int i;
-
-	ytp1 = wdf19deg(x, delay2T_1, delayT_1, 1, &yhp1);
-	ytp2 = wdf19deg(ytp1, delay2T_2, delayT_2, 2, &yhp2);
-	ytp3 = wdf19deg(ytp2, delay2T_3, delayT_3, 3, &yhp3);
-
-	// Calculate output
-	b = weights[0]*delayHP1[23] + weights[1]*delayHP2[15] + weights[2]*yhp3 + weights[3]*ytp3;
-
-	// Shift delays
-	for (i = 23; i > 0; i--)
-	{
-		*(delayHP1+i) = *(delayHP1+i-1); // delayHP1[i] = delayHP1[i-1]
-	}
-
-	for (i = 15; i > 0; i--)
-	{
-		*(delayHP2+i) = *(delayHP2+i-1); // delayHP1[i] = delayHP1[i-1]
-	}
-
-	// Save HP outputs into delays
-	delayHP1[0] = yhp1;
-	delayHP2[0] = yhp2;
-
-	return b;
-}
 
 /*
  * Implements a 19. degree WDF  
  */
-double wdf19deg(double x, double** delays2T, double* delayT, int n, double* yhp)
+#if 0
+double wdf19deg(double x)
+{
+	// Variables for Adaptor out and inputs
+	double b1, b2, a1;
+
+	a1 = x;
+
+	twoPortCrossAdaptor(alphas[0], a1, upper2T[0][1], &b1, &b2);
+
+	// Shift delay values
+	upper2T[0][1] = upper2T[0][0];
+	upper2T[0][0] = b2;
+
+	return b1;
+}
+#endif
+
+#if 1
+double wdf19deg(double x, double** delays2T, double* delayT, int n)
 {
     // Variables for Adaptor out and inputs
 	double b1, b2, a1;
@@ -138,11 +92,13 @@ double wdf19deg(double x, double** delays2T, double* delayT, int n, double* yhp)
     yUpper = delayT[lastDelayElemT-1];
 
     // Shift |T| delay
-    for (j = lastDelayElemT-1; j > 0; j--)
+    for (j = 0; j < lastDelayElemT; j++)
     {
-    	*(delayT+j) = *(delayT+j-1);	// delayT[j] = delayT[j-1];
+
     }
-    delayT[0] = b1;
+
+    yUpper = upperT;
+    upperT = b1;
 
     /****** Lower half ******/
     a1 = x;
@@ -170,10 +126,9 @@ double wdf19deg(double x, double** delays2T, double* delayT, int n, double* yhp)
     // Output of lower branch
     yLower = b1;
 
-    *yhp = (0.5 * (-yUpper + yLower));
-
     return (0.5 * (yUpper + yLower));
 }
+#endif
 
 /*
  * Calculate a two-port adaptor with crossed output side 
@@ -201,30 +156,4 @@ void twoPortAdaptor(double alpha, double inA1, double inA2, double* outB1, doubl
     // Calculate outputs
     *outB2 = (alpha * firstAdder) + (-1) * inA2;
     *outB1 = ((-1) * firstAdder) + (*outB2);
-}
-
-/*
- * Helper functions
- */
-void init2dArray(double** array, int rows, int cols)
-{
-	int i, j;
-
-	for (i = 0; i < rows; i++)
-	{
-		for (j = 0; j < cols; j++)
-		{
-			array[i][j] = 0;
-		}
-	}
-}
-
-void initArray(double* array, int size)
-{
-	int i;
-
-	for (i = 0; i < size; i++)
-	{
-		array[i] = 0;
-	}
 }

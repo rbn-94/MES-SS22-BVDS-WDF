@@ -15,4 +15,16 @@ void initDelays();
 
 double octaveFilterbank(double x);
 
+
+/*
+ * Implements a 19. degree WDF
+ * @params:
+ * 		- x [in]: input sample
+ * 		- ...
+ * @returns:
+ * 		- filtered output
+ * */
+double wdf19deg(double x, double** delays2T, double* delayT, int n);
+
+
 #endif /* WDF19DEG_H_ */

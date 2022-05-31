@@ -8,8 +8,6 @@
 
 #include "wdf19deg.h"
 
-#define NUM_DELAY_BLOCKS 9
-
 /* Coefficients */
 double alphas[9] = {
     -0.226119,
@@ -23,8 +21,7 @@ double alphas[9] = {
     0.015279
 };
 
-double weights[4] = {
-		1.0,
+double weights[3] = {
 		1.0,
 		1.0,
 		1.0
@@ -68,32 +65,12 @@ double octaveFilterbank(double x)
 {
 	double yhp1, yhp2, yhp3;
 	double ytp1, ytp2, ytp3;
-	double b = 0.0;
-	int i;
 
 	ytp1 = wdf19deg(x, delay2T_1, delayT_1, 1, &yhp1);
 	ytp2 = wdf19deg(ytp1, delay2T_2, delayT_2, 2, &yhp2);
-	ytp3 = wdf19deg(ytp2, delay2T_3, delayT_3, 3, &yhp3);
+	ytp3 = wdf19deg(ytp2, delay2T_3, delayT_3, 3, yhp3);
 
-	// Calculate output
-	b = weights[0]*delayHP1[23] + weights[1]*delayHP2[15] + weights[2]*yhp3 + weights[3]*ytp3;
 
-	// Shift delays
-	for (i = 23; i > 0; i--)
-	{
-		*(delayHP1+i) = *(delayHP1+i-1); // delayHP1[i] = delayHP1[i-1]
-	}
-
-	for (i = 15; i > 0; i--)
-	{
-		*(delayHP2+i) = *(delayHP2+i-1); // delayHP1[i] = delayHP1[i-1]
-	}
-
-	// Save HP outputs into delays
-	delayHP1[0] = yhp1;
-	delayHP2[0] = yhp2;
-
-	return b;
 }
 
 /*

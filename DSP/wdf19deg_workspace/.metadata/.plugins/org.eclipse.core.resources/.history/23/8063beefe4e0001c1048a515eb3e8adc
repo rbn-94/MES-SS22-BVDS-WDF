@@ -8,8 +8,6 @@
 
 #include "wdf19deg.h"
 
-#define NUM_DELAY_BLOCKS 9
-
 /* Coefficients */
 double alphas[9] = {
     -0.226119,

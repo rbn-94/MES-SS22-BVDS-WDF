@@ -9,6 +9,7 @@
 
 #define false 0
 #define true 1
+#define NUM_DELAY_BLOCKS 9
 
 volatile Uint32 timertick;
 short count_INT=0;
@@ -19,11 +20,17 @@ short outData = 0;
 double dInput = 0;
 double dOutput = 0;
 
+/* Globals for delays T and 2T */
+double delay2T_1[NUM_DELAY_BLOCKS-1][2];
+double delayT_1[1];
 
+double delay2T_2[NUM_DELAY_BLOCKS-1][4];
+double delayT_2[2];
+
+double delay2T_3[NUM_DELAY_BLOCKS-1][8];
+double delayT_3[4];
 
 Bool newSampleAvailable = false;
-
-
 
 //set sampling rate
 
@@ -47,8 +54,6 @@ interrupt void intser_McBSP0()
 
 void main()
 {
-	initDelays();
-
 	c6713_dsk_init(); 				//init DSK, codec, McBSP
 	mcbsp_start();					//start Audioport
 	mcbsp_int_init();				//init MSBSP Interrupt
@@ -67,7 +72,7 @@ void main()
 		if(newSampleAvailable)
 		{
 			dInput = (double)((double)inData / 32768);
-			dOutput = octaveFilterbank(dInput);
+			dOutput = wdf19deg(dInput);
 			outData = (short)(dOutput * 32768);
 			output_sample(outData);   					//output 32 bit data, LEFT and RIGHT
 
@@ -80,3 +85,4 @@ void main()
 
 	}
 }
+

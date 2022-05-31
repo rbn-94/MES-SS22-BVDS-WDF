@@ -19,11 +19,7 @@ short outData = 0;
 double dInput = 0;
 double dOutput = 0;
 
-
-
 Bool newSampleAvailable = false;
-
-
 
 //set sampling rate
 
@@ -47,8 +43,6 @@ interrupt void intser_McBSP0()
 
 void main()
 {
-	initDelays();
-
 	c6713_dsk_init(); 				//init DSK, codec, McBSP
 	mcbsp_start();					//start Audioport
 	mcbsp_int_init();				//init MSBSP Interrupt
@@ -67,7 +61,7 @@ void main()
 		if(newSampleAvailable)
 		{
 			dInput = (double)((double)inData / 32768);
-			dOutput = octaveFilterbank(dInput);
+			dOutput = wdf19deg(dInput);
 			outData = (short)(dOutput * 32768);
 			output_sample(outData);   					//output 32 bit data, LEFT and RIGHT
 
@@ -80,3 +74,4 @@ void main()
 
 	}
 }
+
