@@ -15,4 +15,6 @@ void initDelays();
 
 double octaveFilterbank(double x);
 
+double calcSingleWdf19deg(double x);
+
 #endif /* WDF19DEG_H_ */

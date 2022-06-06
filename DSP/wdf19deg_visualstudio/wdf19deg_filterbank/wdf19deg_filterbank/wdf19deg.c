@@ -86,7 +86,7 @@ double octaveFilterbank(double x)
 
     for (i = 15; i > 0; i--)
     {
-        delayHP1[i] = delayHP1[i - 1];
+        delayHP2[i] = delayHP2[i - 1];
     }
 
     // Save HP outputs into delays
@@ -107,7 +107,7 @@ double wdf19deg(double x, double* delays2T, double* delayT, int n, double* yhp)
     // interim results
     double yUpper = 0, yLower = 0;
 
-    int sz2Tdelay = (2 << n);
+    int sz2Tdelay = (1 << n);
     int szTdelay= sz2Tdelay / 2;
 
     /****** Upper half ******/
@@ -130,7 +130,7 @@ double wdf19deg(double x, double* delays2T, double* delayT, int n, double* yhp)
         {
             delays2T[i*sz2Tdelay + j] = delays2T[i*sz2Tdelay + (j-1)]; // delays2T[i][j] = delays2T[i][j-1]
         }
-        delays2T[i * sz2Tdelay + 0] = b2;
+        delays2T[i*sz2Tdelay + 0] = b2; // delays2T[i][0] = b2
         a1 = b1;
     }
 
@@ -163,7 +163,7 @@ double wdf19deg(double x, double* delays2T, double* delayT, int n, double* yhp)
         {
             delays2T[i*sz2Tdelay + j] = delays2T[i*sz2Tdelay + (j - 1)]; // delays2T[i][j] = delays2T[i][j-1]
         }
-        delays2T[i*sz2Tdelay + 0] = b2;
+        delays2T[i*sz2Tdelay + 0] = b2; // delays2T[i][0] = b2
         a1 = b1;
     }
 
