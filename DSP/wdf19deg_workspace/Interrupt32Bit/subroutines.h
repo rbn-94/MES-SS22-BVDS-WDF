@@ -5,7 +5,7 @@
 #include "dsk6713_aic23.h"			/*codec-DSK support file*/
 #include "dsk6713_led.h"
 #include <csl_edma.h>
-#define N 256
+#define N 1
 
 #define LEFT  1                  /*data structure for union of 32-bit data*/
 #define RIGHT 0                  /*into two 16-bit data*/

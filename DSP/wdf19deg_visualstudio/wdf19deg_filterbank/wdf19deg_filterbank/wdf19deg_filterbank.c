@@ -9,6 +9,8 @@
 #define ROWS 4
 #define COLS 6
 
+#define GAIN 1
+
 double xSample[N];
 double y[N];
 
@@ -42,7 +44,7 @@ int main()
 
 	for (int i = 0; i < N; i++)
 	{
-		y[i] = octaveFilterbank(xSample[i]);
+		y[i] = octaveFilterbank(xSample[i]) * GAIN;
 		//y[i] = calcSingleWdf19deg(xSample[i]);
 	}
 
@@ -61,7 +63,7 @@ void createImpulse()
 
 void createSinus()
 {
-	int f = 800;
+	int f = 1000;
 	int fs = 48000;
 
 	double m_phase = 0.0;

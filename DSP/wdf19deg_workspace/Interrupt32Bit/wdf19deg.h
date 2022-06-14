@@ -8,13 +8,12 @@
 #ifndef WDF19DEG_H_
 #define WDF19DEG_H_
 
-#include "tistdtypes.h"
-
+#include "delay.h"
 
 void initDelays();
 
-double octaveFilterbank(double x);
+float octaveFilterbank(float x);
 
-double calcSingleWdf19deg(double x);
+float calcSingleWdf19deg(float x);
 
 #endif /* WDF19DEG_H_ */
