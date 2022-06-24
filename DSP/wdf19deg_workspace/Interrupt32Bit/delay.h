@@ -26,14 +26,16 @@ inline void delayPut(Delay *d, float value)
 	d->buf[d->write] = value;
     d->write++;
 
-	if (d->write == d->length) d->write = 0;
+	if (d->write == d->length) 
+		d->write = 0;
 }
 
 inline float delayGet(Delay *d)
 {
 	float item = d->buf[d->read];
 	d->read++;
-	if (d->read == d->length) d->read = 0;
+	if (d->read == d->length) 
+		d->read = 0;
 	return item;
 }
 

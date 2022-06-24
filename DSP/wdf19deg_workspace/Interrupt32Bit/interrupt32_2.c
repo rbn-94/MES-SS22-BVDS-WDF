@@ -12,12 +12,10 @@ volatile Uint32 timertick;
 short count_INT=0;
 AIC_data AnalogIn;
 
-short inData = 0;
-short outData = 0;
-float dInput = 0;
-float dOutput = 0;
+volatile short inData = 0;
+volatile short outData = 0;
 
-Bool newSampleAvailable = false;
+volatile Bool newSampleAvailable = false;
 
 interrupt void int_Timer0(){
 	DSK6713_LED_on(1);
@@ -32,13 +30,16 @@ interrupt void intser_McBSP0()
 
 void main()
 {
+	float dInput = 0.0;
+	float dOutput = 0.0;
+
 	initDelays();
 
 	c6713_dsk_init(); 				//init DSK, codec, McBSP
 	mcbsp_start();					//start Audioport
 	mcbsp_int_init();				//init MSBSP Interrupt
 
-	DSK6713_LED_off(1);				//lösche LED
+	DSK6713_LED_off(1);				//lï¿½sche LED
 	while(1)
 	{
 		if(newSampleAvailable)
